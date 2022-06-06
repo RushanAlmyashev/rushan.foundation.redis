@@ -1,0 +1,9 @@
+/src/*/obj/*
+/src/.vs/*
+/src/*/bin/*
+/src/**/bin/**
+/.vs/*
+/src/obj
+/src/**.user
+**/bin/**
+**/obj/**
