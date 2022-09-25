@@ -21,7 +21,7 @@ namespace Rushan.Foundation.Redis.Providers.Impl
             => GetOrAddFromCache(execFunc, cacheKey, _defaultCachePolicy);
 
         public async Task<T> GetOrAddFromCacheAsync<T>(Func<Task<T>> execFuncAsync, string cacheKey)
-            => await GetOrAddFromCacheAsync(execFuncAsync, cacheKey, _defaultCachePolicy);
+            => await GetOrAddFromCacheAsync(execFuncAsync, cacheKey, _defaultCachePolicy).ConfigureAwait(false);
 
 #pragma warning disable 1998
         public async Task<T> GetOrAddFromCacheAsync<T>(Func<T> execFunc, string cacheKey)
@@ -50,7 +50,7 @@ namespace Rushan.Foundation.Redis.Providers.Impl
                 AbsoluteExpiration = dateTimeOffset
             };
 
-            return await GetOrAddFromCacheAsync(execFuncAsync, cacheKey, cachePolicy);
+            return await GetOrAddFromCacheAsync(execFuncAsync, cacheKey, cachePolicy).ConfigureAwait(false);
         }
 
 #pragma warning disable 1998
@@ -86,7 +86,7 @@ namespace Rushan.Foundation.Redis.Providers.Impl
                 return MemoryCacheGet<T>(cacheKey);
             }
 
-            var result = await execFuncAsync();
+            var result = await execFuncAsync().ConfigureAwait(false);
 
             MemoryCacheSet(cacheKey, result, cacheItemPolicy);
 

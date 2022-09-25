@@ -74,10 +74,10 @@ namespace Rushan.Foundation.Redis.Providers.Impl
             => GetOrAddFromCache(execFunc, cacheKey, _defaultCacheTime);
 
         public async Task<T> GetOrAddFromCacheAsync<T>(Func<Task<T>> execFuncAsync, string cacheKey)
-            => await GetOrAddFromCacheAsync(execFuncAsync, cacheKey, _defaultCacheTime);
+            => await GetOrAddFromCacheAsync(execFuncAsync, cacheKey, _defaultCacheTime).ConfigureAwait(false);
 
         public async Task<T> GetOrAddFromCacheAsync<T>(Func<T> execFunc, string cacheKey)
-        => await GetOrAddFromCacheAsync(execFunc, cacheKey, _defaultCacheTime);
+        => await GetOrAddFromCacheAsync(execFunc, cacheKey, _defaultCacheTime).ConfigureAwait(false);
 
 
         /// <inheritdoc />
@@ -128,19 +128,19 @@ namespace Rushan.Foundation.Redis.Providers.Impl
             T result;
             TimeSpan? redisCacheTime;
 
-            if (await _redisPersistence.ContainsKeyAsync(cacheKey))
+            if (await _redisPersistence.ContainsKeyAsync(cacheKey).ConfigureAwait(false))
             {
-                var byteValue = await _redisPersistence.GetCachedValueAsync(cacheKey);
+                var byteValue = await _redisPersistence.GetCachedValueAsync(cacheKey).ConfigureAwait(false);
                 result = _serializer.Deserialize<T>(byteValue);
 
-                redisCacheTime = await _redisPersistence.KeyTimeToLiveAsync(cacheKey);
+                redisCacheTime = await _redisPersistence.KeyTimeToLiveAsync(cacheKey).ConfigureAwait(false);
             }
             else
             {
-                result = await execFuncAsync();
+                result = await execFuncAsync().ConfigureAwait(false);
 
                 var byteResult = _serializer.Serialize(result);
-                await _redisPersistence.SetCachedValueAsync(cacheKey, byteResult, cacheTime);
+                await _redisPersistence.SetCachedValueAsync(cacheKey, byteResult, cacheTime).ConfigureAwait(false);
 
                 redisCacheTime = cacheTime;
             }
@@ -164,19 +164,19 @@ namespace Rushan.Foundation.Redis.Providers.Impl
             T result;
             TimeSpan? redisCacheTime;
 
-            if (await _redisPersistence.ContainsKeyAsync(cacheKey))
+            if (await _redisPersistence.ContainsKeyAsync(cacheKey).ConfigureAwait(false))
             {
-                var byteValue = await _redisPersistence.GetCachedValueAsync(cacheKey);
+                var byteValue = await _redisPersistence.GetCachedValueAsync(cacheKey).ConfigureAwait(false);
                 result = _serializer.Deserialize<T>(byteValue);
 
-                redisCacheTime = await _redisPersistence.KeyTimeToLiveAsync(cacheKey);
+                redisCacheTime = await _redisPersistence.KeyTimeToLiveAsync(cacheKey).ConfigureAwait(false);
             }
             else
             {
                 result = execFunc();
 
                 var byteResult = _serializer.Serialize(result);
-                await _redisPersistence.SetCachedValueAsync(cacheKey, byteResult, cacheTime);
+                await _redisPersistence.SetCachedValueAsync(cacheKey, byteResult, cacheTime).ConfigureAwait(false);
 
                 redisCacheTime = cacheTime;
             }
@@ -250,10 +250,10 @@ namespace Rushan.Foundation.Redis.Providers.Impl
                 return MemoryCacheGet<T>(cacheKey);
             }
 
-            var stringValue = await _redisPersistence.GetCachedValueAsync(cacheKey);
+            var stringValue = await _redisPersistence.GetCachedValueAsync(cacheKey).ConfigureAwait(false);
             var value = _serializer.Deserialize<T>(stringValue);
 
-            var keyTimeToLive = await _redisPersistence.KeyTimeToLiveAsync(cacheKey);
+            var keyTimeToLive = await _redisPersistence.KeyTimeToLiveAsync(cacheKey).ConfigureAwait(false);
             var cacheItemPolicy = CacheItemPolicyHelper.ComputeCacheItemPolicy(keyTimeToLive);
 
             MemoryCacheSet(cacheKey, value, cacheItemPolicy);
@@ -290,7 +290,7 @@ namespace Rushan.Foundation.Redis.Providers.Impl
                 return true;
             }
 
-            if (await _redisPersistence.ContainsKeyAsync(cacheKey))
+            if (await _redisPersistence.ContainsKeyAsync(cacheKey).ConfigureAwait(false))
             {
                 return true;
             }

@@ -69,9 +69,11 @@ namespace Rushan.Foundation.Redis.Providers.Impl
         /// <inheritdoc/>
         public T GetOrAddFromCache<T>(Func<T> execFunc, string cacheKey) => GetOrAddFromCache(execFunc, cacheKey, _defaultCacheTime);
 
-        public async Task<T> GetOrAddFromCacheAsync<T>(Func<Task<T>> execFunc, string cacheKey) => await GetOrAddFromCacheAsync(execFunc, cacheKey, _defaultCacheTime);
+        public async Task<T> GetOrAddFromCacheAsync<T>(Func<Task<T>> execFunc, string cacheKey) 
+            => await GetOrAddFromCacheAsync(execFunc, cacheKey, _defaultCacheTime).ConfigureAwait(false);
 
-        public async Task<T> GetOrAddFromCacheAsync<T>(Func<T> execFunc, string cacheKey) => await GetOrAddFromCacheAsync(execFunc, cacheKey, _defaultCacheTime);
+        public async Task<T> GetOrAddFromCacheAsync<T>(Func<T> execFunc, string cacheKey) => 
+            await GetOrAddFromCacheAsync(execFunc, cacheKey, _defaultCacheTime).ConfigureAwait(false);
 
         /// <inheritdoc/>
         public T GetOrAddFromCache<T>(Func<T> execFunc, string cacheKey, TimeSpan cacheTime)
@@ -105,16 +107,16 @@ namespace Rushan.Foundation.Redis.Providers.Impl
 
             try
             {
-                var isContainsKey = await _redisPersistence.ContainsKeyAsync(cacheKey);
+                var isContainsKey = await _redisPersistence.ContainsKeyAsync(cacheKey).ConfigureAwait(false);
                 if (isContainsKey)
                 {
-                    return await GetCachedValueAsync<T>(cacheKey);
+                    return await GetCachedValueAsync<T>(cacheKey).ConfigureAwait(false);
                 }
 
-                var value = await execFuncAsync();
+                var value = await execFuncAsync().ConfigureAwait(false);
                 var cachedValue = _serializer.Serialize(value);
 
-                await _redisPersistence.SetCachedValueAsync(cacheKey, cachedValue, cacheTime);
+                await _redisPersistence.SetCachedValueAsync(cacheKey, cachedValue, cacheTime).ConfigureAwait(false);
 
                 return value;
             }
@@ -131,16 +133,16 @@ namespace Rushan.Foundation.Redis.Providers.Impl
 
             try
             {
-                var isContainsKey = await _redisPersistence.ContainsKeyAsync(cacheKey);
+                var isContainsKey = await _redisPersistence.ContainsKeyAsync(cacheKey).ConfigureAwait(false);
                 if (isContainsKey)
                 {
-                    return await GetCachedValueAsync<T>(cacheKey);
+                    return await GetCachedValueAsync<T>(cacheKey).ConfigureAwait(false);
                 }
 
                 var value = execFunc();
                 var cachedValue = _serializer.Serialize(value);
 
-                await _redisPersistence.SetCachedValueAsync(cacheKey, cachedValue, cacheTime);
+                await _redisPersistence.SetCachedValueAsync(cacheKey, cachedValue, cacheTime).ConfigureAwait(false);
 
                 return value;
             }
@@ -166,7 +168,7 @@ namespace Rushan.Foundation.Redis.Providers.Impl
             ValidateKey(cacheKey);
 
             var stringValue = _serializer.Serialize(value);
-            await _redisPersistence.SetCachedValueAsync(cacheKey, stringValue, cacheTime);
+            await _redisPersistence.SetCachedValueAsync(cacheKey, stringValue, cacheTime).ConfigureAwait(false);
         }
 
 
@@ -190,7 +192,7 @@ namespace Rushan.Foundation.Redis.Providers.Impl
         {
             ValidateKey(cacheKey);
 
-            var cachedValue = await _redisPersistence.GetCachedValueAsync(cacheKey);
+            var cachedValue = await _redisPersistence.GetCachedValueAsync(cacheKey).ConfigureAwait(false);
 
             if (cachedValue == null)
             {
@@ -240,7 +242,7 @@ namespace Rushan.Foundation.Redis.Providers.Impl
 
             try
             {
-                return await _redisPersistence.ContainsKeyAsync(cacheKey);
+                return await _redisPersistence.ContainsKeyAsync(cacheKey).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -271,7 +273,7 @@ namespace Rushan.Foundation.Redis.Providers.Impl
 
             try
             {
-                await _redisPersistence.DeleteItemAsync(cacheKey);
+                await _redisPersistence.DeleteItemAsync(cacheKey).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -293,11 +295,11 @@ namespace Rushan.Foundation.Redis.Providers.Impl
         /// <inheritdoc/>
         public async Task IncrementCounterAsync(string counterKey, TimeSpan? timeToLive = null)
         {
-            await _redisPersistence.StringIncrementAsync(counterKey);
+            await _redisPersistence.StringIncrementAsync(counterKey).ConfigureAwait(false);
 
             if (timeToLive != null)
             {
-                await _redisPersistence.SetCacheKeyExpireAsync(counterKey, timeToLive.Value);
+                await _redisPersistence.SetCacheKeyExpireAsync(counterKey, timeToLive.Value).ConfigureAwait(false);
             }
         }
 
@@ -312,7 +314,7 @@ namespace Rushan.Foundation.Redis.Providers.Impl
 
         public async Task<int> GetCounterValueAsync(string counterKey)
         {
-            var byteArrayValue = await _redisPersistence.GetCachedValueAsync(counterKey);
+            var byteArrayValue = await _redisPersistence.GetCachedValueAsync(counterKey).ConfigureAwait(false);
 
             var value = Convert.ToInt32(System.Text.Encoding.UTF8.GetString(byteArrayValue));
 
@@ -328,7 +330,7 @@ namespace Rushan.Foundation.Redis.Providers.Impl
         /// <inheritdoc/>
         public async Task<TimeSpan?> GetKeyExpirationTimeAsync(string cacheKey)
         {
-            return await _redisPersistence.KeyTimeToLiveAsync(cacheKey);
+            return await _redisPersistence.KeyTimeToLiveAsync(cacheKey).ConfigureAwait(false);
         }
     }
 }

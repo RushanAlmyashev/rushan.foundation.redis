@@ -49,7 +49,7 @@ namespace Rushan.Foundation.Redis.Persistences
         {
             var db = _redis.GetDatabase();
 
-            var data = await db.StringGetAsync(cacheKey);
+            var data = await db.StringGetAsync(cacheKey).ConfigureAwait(false);
 
             if (string.IsNullOrEmpty(data))
             {
@@ -72,7 +72,7 @@ namespace Rushan.Foundation.Redis.Persistences
         {
             var db = _redis.GetDatabase();
 
-            await db.StringSetAsync(cacheKey, value, timeout);
+            await db.StringSetAsync(cacheKey, value, timeout).ConfigureAwait(false); 
         }
 
         /// <inheritdoc/>
@@ -98,7 +98,7 @@ namespace Rushan.Foundation.Redis.Persistences
             {
                 var db = _redis.GetDatabase();
 
-                return await db.KeyExistsAsync(cacheKey);
+                return await db.KeyExistsAsync(cacheKey).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -128,7 +128,7 @@ namespace Rushan.Foundation.Redis.Persistences
             try
             {
                 var db = _redis.GetDatabase();
-                await db.KeyDeleteAsync(cacheKey);
+                await db.KeyDeleteAsync(cacheKey).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -156,7 +156,7 @@ namespace Rushan.Foundation.Redis.Persistences
             try
             {
                 var db = _redis.GetDatabase();
-                await db.KeyExpireAsync(cacheKey, timeout);
+                await db.KeyExpireAsync(cacheKey, timeout).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -218,7 +218,7 @@ namespace Rushan.Foundation.Redis.Persistences
             try
             {
                 var db = _redis.GetDatabase();
-                return await db.KeyTimeToLiveAsync(cacheKey);
+                return await db.KeyTimeToLiveAsync(cacheKey).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -248,7 +248,7 @@ namespace Rushan.Foundation.Redis.Persistences
             try
             {
                 var db = _redis.GetDatabase();
-                await db.StringIncrementAsync(cacheKey);
+                await db.StringIncrementAsync(cacheKey).ConfigureAwait(false);
             }
             catch (Exception e)
             {
