@@ -14,5 +14,6 @@ namespace Rushan.Foundation.Redis.Logger
 
         void Debug(string message);
 
+        void Trace(string message);
     }
 }

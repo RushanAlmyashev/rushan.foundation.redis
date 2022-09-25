@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
-using Rushan.Foundation.Redis.Distribution;
 using System;
 using System.Threading;
+using Rushan.Foundation.Redis.Distribution;
 
 namespace Rushan.Foundation.Redis.Tests.Distribution
 {

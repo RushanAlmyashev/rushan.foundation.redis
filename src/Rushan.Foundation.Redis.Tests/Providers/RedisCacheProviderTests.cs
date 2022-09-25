@@ -2,13 +2,14 @@
 using Rushan.Foundation.Redis.Persistences;
 using Rushan.Foundation.Redis.Providers;
 using Rushan.Foundation.Redis.Serialization;
-using Rushan.Foundation.Redis.Tests.Dummy;
 using AutoFixture;
 using Moq;
 using NUnit.Framework;
+using Rushan.Foundation.Redis.Tests.Dummy;
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using Rushan.Foundation.Redis.Providers.Impl;
 
 namespace Rushan.Foundation.Redis.Tests.Providers
 {
@@ -49,7 +50,7 @@ namespace Rushan.Foundation.Redis.Tests.Providers
 
             _serializer.Setup(c => c.Deserialize<DateTime>(dataPayload)).Returns(date);
             _redisPersistence.Setup(c => c.ContainsKey(cacheKey)).Returns(true);
-            _redisPersistence.Setup(c => c.GetCachedValue(cacheKey)).Returns(dataPayload);           
+            _redisPersistence.Setup(c => c.GetCachedValue(cacheKey)).Returns(dataPayload);
 
             var actual = _target.GetOrAddFromCache(() => _dummy.Object.DummyMetod(), cacheKey);
 
@@ -70,7 +71,7 @@ namespace Rushan.Foundation.Redis.Tests.Providers
 
             var actual = _target.GetOrAddFromCache(() => _dummy.Object.DummyMetod(), cacheKey);
 
-            _dummy.Verify(mock => mock.DummyMetod(), Times.Once());            
+            _dummy.Verify(mock => mock.DummyMetod(), Times.Once());
             Assert.AreEqual(actual, date);
         }
 
@@ -87,7 +88,7 @@ namespace Rushan.Foundation.Redis.Tests.Providers
 
             var actual = await _target.GetOrAddFromCacheAsync(() => _dummy.Object.DummyMetodAsync(), cacheKey, TimeSpan.FromSeconds(10));
 
-            _dummy.Verify(mock => mock.DummyMetodAsync(), Times.Never());            
+            _dummy.Verify(mock => mock.DummyMetodAsync(), Times.Never());
             Assert.AreEqual(actual, date);
         }
 
@@ -116,7 +117,7 @@ namespace Rushan.Foundation.Redis.Tests.Providers
             var dataPayload = Guid.NewGuid().ToByteArray();
             var cacheKey = Guid.NewGuid().ToString();
 
-            _serializer.Setup(c => c.Serialize(date)).Returns(dataPayload);            
+            _serializer.Setup(c => c.Serialize(date)).Returns(dataPayload);
 
             Assert.DoesNotThrow(() =>
             {
@@ -125,7 +126,9 @@ namespace Rushan.Foundation.Redis.Tests.Providers
         }
 
         [Test]
+#pragma warning disable 1998
         public async Task WhenCallAddOrUpdateAsync_DoesNotThrow()
+#pragma warning restore 1998
         {
             var date = DateTime.Now;
 
@@ -134,7 +137,10 @@ namespace Rushan.Foundation.Redis.Tests.Providers
 
             _serializer.Setup(c => c.Serialize(date)).Returns(dataPayload);
 
-            await _target.AddOrUpdateValueAsync(cacheKey, date, TimeSpan.FromSeconds(10));
+            Assert.DoesNotThrowAsync(async () =>
+            {
+                await _target.AddOrUpdateValueAsync(cacheKey, date, TimeSpan.FromSeconds(10));
+            });
         }
 
         [Test]
@@ -181,13 +187,15 @@ namespace Rushan.Foundation.Redis.Tests.Providers
         }
 
         [Test]
-        public void WhenCallGetCachedValueAsync_ValueIsEmpty_Throw()
+#pragma warning disable 1998
+        public async Task WhenCallGetCachedValueAsync_ValueIsEmpty_Throw()
+#pragma warning restore 1998
         {
             var cacheKey = Guid.NewGuid().ToString();
 
             _redisPersistence.Setup(c => c.GetCachedValueAsync(cacheKey)).ReturnsAsync((byte[])default);
 
-            var ex = Assert.ThrowsAsync<Exception>(async () => await  _target.GetCachedValueAsync<DateTime>(cacheKey));
+            var ex = Assert.ThrowsAsync<Exception>(async () => await _target.GetCachedValueAsync<DateTime>(cacheKey));
             Assert.That(ex.Message, Is.EqualTo("Cached value from db is empty"));
         }
 
@@ -233,20 +241,25 @@ namespace Rushan.Foundation.Redis.Tests.Providers
         }
 
         [Test]
+#pragma warning disable 1998
         public async Task WhenCallDeleteItemAsync_DoesNotThrow()
+#pragma warning restore 1998
         {
             var cacheKey = Guid.NewGuid().ToString();
 
             _redisPersistence.Setup(c => c.DeleteItemAsync(cacheKey));
 
-             await _target.DeleteItemAsync(cacheKey);
+            Assert.DoesNotThrowAsync(async () =>
+            {
+                await _target.DeleteItemAsync(cacheKey);
+            });
         }
 
         [Test]
         [TestCase(true, "dataPayload", "05/05/2002", "05/05/2002", true)]
-        [TestCase(true,  null        , "05/05/2002", "05/05/2002", true)]
-        [TestCase(false, null        , "1/1/0001", "05/05/2002", false)]
-        public void WhenCallTryGet_ReturnExpectedValue(bool expected, string dataPayload, 
+        [TestCase(true, null, "05/05/2002", "05/05/2002", true)]
+        [TestCase(false, null, "1/1/0001", "05/05/2002", false)]
+        public void WhenCallTryGet_ReturnExpectedValue(bool expected, string dataPayload,
             DateTime expectedDate, DateTime dateInCache, bool redisCacheContains)
         {
             var cacheKey = Guid.NewGuid().ToString();
@@ -293,7 +306,7 @@ namespace Rushan.Foundation.Redis.Tests.Providers
         public void WhenCallGetPointer_ReturnsExpectedResult()
         {
             var cacheKey = Guid.NewGuid().ToString();
-            var number =  _fixture.Create<int>();
+            var number = _fixture.Create<int>();
 
             _redisPersistence.Setup(obj => obj.GetCachedValue(It.IsAny<string>()))
                 .Returns(Encoding.UTF8.GetBytes(number.ToString()));
@@ -345,7 +358,7 @@ namespace Rushan.Foundation.Redis.Tests.Providers
             Assert.AreEqual(expirationTime, actual);
         }
 
-        private static byte[] ToByteArray(string dataPayload) 
+        private static byte[] ToByteArray(string dataPayload)
         {
             if (dataPayload == null)
             {

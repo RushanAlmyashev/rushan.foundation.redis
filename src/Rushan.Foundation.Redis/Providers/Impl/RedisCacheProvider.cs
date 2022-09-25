@@ -1,11 +1,11 @@
-﻿using Rushan.Foundation.Redis.Configuration;
-using Rushan.Foundation.Redis.Persistences;
-using Rushan.Foundation.Redis.Logger;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Rushan.Foundation.Redis.Serialization;
+using Rushan.Foundation.Redis.Persistences;
+using Rushan.Foundation.Redis.Logger;
+using Rushan.Foundation.Redis.Configuration;
 
-namespace Rushan.Foundation.Redis.Providers
+namespace Rushan.Foundation.Redis.Providers.Impl
 {
     /// <summary>
     /// Manage redis cache instance
@@ -13,8 +13,8 @@ namespace Rushan.Foundation.Redis.Providers
     public class RedisCacheProvider : BaseCacheProvider, ICacheProvider, IRedisCacheProvider
     {
         private readonly IRedisPersistence _redisPersistence;
-        
-        private readonly TimeSpan _defaultCacheTime;        
+
+        private readonly TimeSpan _defaultCacheTime;
         private readonly ISerializer _serializer;
         private readonly ILogger _logger;
 
@@ -212,7 +212,7 @@ namespace Rushan.Foundation.Redis.Providers
                 value = GetCachedValue<T>(cacheKey);
                 return true;
             }
-                
+
             value = default;
             return false;
         }

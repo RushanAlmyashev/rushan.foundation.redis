@@ -15,5 +15,6 @@ namespace Rushan.Foundation.Redis.Distribution
         /// <param name="distributedLock">The flag</param>
         /// <returns>If flag captured return true, otherwise - false</returns>
         bool TryAcquireDistributedLock(string lockToken, TimeSpan leaseTimeout, out IDisposable distributedLock);
+        bool TryRaiseDistributedFlag(string flagToken, TimeSpan leaseTimeout);
     }
 }

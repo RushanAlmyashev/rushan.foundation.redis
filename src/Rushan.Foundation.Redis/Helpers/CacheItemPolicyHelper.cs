@@ -18,7 +18,7 @@ namespace Rushan.Foundation.Redis.Helpers
         {
             if (baseCacheTime == null)
             {
-                return GetCacheItemPolicy(TimeSpan.FromHours(1));                
+                return GetCacheItemPolicy(TimeSpan.FromHours(1));
             }
 
             if (baseCacheTime > TimeSpan.FromHours(24))
@@ -38,7 +38,7 @@ namespace Rushan.Foundation.Redis.Helpers
         /// <returns>CacheItemPolicy</returns>
         public static CacheItemPolicy GetCacheItemPolicy(TimeSpan cacheTime)
         {
-            return new CacheItemPolicy { AbsoluteExpiration = DateTime.UtcNow.Add(cacheTime) }; 
+            return new CacheItemPolicy { AbsoluteExpiration = DateTime.UtcNow.Add(cacheTime) };
         }
     }
 }

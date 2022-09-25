@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Rushan.Foundation.Redis.Persistences
 {
     internal class RedisPersistence : IRedisPersistence
-    {            
+    {
         private readonly ILogger _logger;
 
         private readonly TimeSpan _reconnectionTimeout = TimeSpan.FromSeconds(5);
@@ -27,7 +27,7 @@ namespace Rushan.Foundation.Redis.Persistences
             _logger = logger;
             _lazyConnection = new Lazy<ConnectionMultiplexer>(() => ConnectToRedisCluster(connectionString));
         }
-               
+
 
         /// <inheritdoc/>
         public byte[] GetCachedValue(string cacheKey)
@@ -81,7 +81,7 @@ namespace Rushan.Foundation.Redis.Persistences
             try
             {
                 var db = _redis.GetDatabase();
-                    
+
                 return db.KeyExists(cacheKey);
             }
             catch (Exception e)
@@ -113,7 +113,7 @@ namespace Rushan.Foundation.Redis.Persistences
             try
             {
                 var db = _redis.GetDatabase();
-                
+
                 db.KeyDelete(cacheKey);
             }
             catch (Exception e)
@@ -170,8 +170,8 @@ namespace Rushan.Foundation.Redis.Persistences
             try
             {
                 var db = _redis.GetDatabase();
-                    
-                return db.LockTake(lockKey, lockValue,  expiry);
+
+                return db.LockTake(lockKey, lockValue, expiry);
             }
             catch (Exception e)
             {
@@ -217,7 +217,7 @@ namespace Rushan.Foundation.Redis.Persistences
         {
             try
             {
-                var db = _redis.GetDatabase();                
+                var db = _redis.GetDatabase();
                 return await db.KeyTimeToLiveAsync(cacheKey);
             }
             catch (Exception e)
@@ -269,7 +269,7 @@ namespace Rushan.Foundation.Redis.Persistences
                 if (_lazyConnection.IsValueCreated && _redis.IsConnected)
                 {
                     _logger.Warn("Redis connection is already open");
-                    
+
                     return _redis;
                 }
 
@@ -280,15 +280,15 @@ namespace Rushan.Foundation.Redis.Persistences
                     _logger.Info($"Initializing connection to redis cluster {connectionString}");
 
                     var configuration = ConfigurationOptions.Parse(connectionString);
-                    
-                    
-                    configuration.ClientName = String.Format("MachineName:'{0}'-Application:'{1}'"
+
+
+                    configuration.ClientName = string.Format("MachineName:'{0}'-Application:'{1}'"
                         , Environment.MachineName.ToLowerInvariant()
                         , ApplicationHelper.GetApplicationName());
-                    
+
                     var deltaBackOffMilliseconds = (int)_reconnectionTimeout.TotalMilliseconds;
                     configuration.ReconnectRetryPolicy = new ExponentialRetry(deltaBackOffMilliseconds);
-                    
+
                     var redis = ConnectionMultiplexer.Connect(configuration);
 
                     redis.ConnectionFailed += (sender, args) =>
@@ -315,7 +315,7 @@ namespace Rushan.Foundation.Redis.Persistences
                     throw;
                 }
             }
-        }       
+        }
 
         /// <summary>
         /// Logger for connection status on Failed/Restore
@@ -336,13 +336,13 @@ namespace Rushan.Foundation.Redis.Persistences
                         var server = redis.GetServer(dnsEndPoint.Host, dnsEndPoint.Port);
                         _logger.Info($"server status: Host:{dnsEndPoint.Host}, port:{dnsEndPoint.Port}, isConnected:{server.IsConnected}");
                     }
-                    else if(endPoint is IPEndPoint)
+                    else if (endPoint is IPEndPoint)
                     {
                         var ipEndPoint = (IPEndPoint)endPoint;
 
                         var server = redis.GetServer(ipEndPoint.Address, ipEndPoint.Port);
                         _logger.Info($"server status: IP address:{ipEndPoint.Address}, port:{ipEndPoint.Port}, isConnected:{server.IsConnected}");
-                    }                    
+                    }
                 }
             }
             catch (Exception ex)

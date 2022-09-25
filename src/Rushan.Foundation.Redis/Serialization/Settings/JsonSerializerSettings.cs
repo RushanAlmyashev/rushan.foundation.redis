@@ -9,9 +9,9 @@
             var result = new System.Text.Json.JsonSerializerOptions
             {
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.BasicLatin, System.Text.Unicode.UnicodeRanges.Cyrillic),
-                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,                
+                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
                 WriteIndented = false,
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,                
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
             };
 
             result.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter(System.Text.Json.JsonNamingPolicy.CamelCase, true));
@@ -29,7 +29,7 @@
             var jsonSerializerSettings = new Newtonsoft.Json.JsonSerializerSettings()
             {
                 TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto,
-                ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore,                
+                ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore,
                 NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore,
                 Formatting = Newtonsoft.Json.Formatting.None,
                 ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver
@@ -37,7 +37,7 @@
                     NamingStrategy = new Newtonsoft.Json.Serialization.CamelCaseNamingStrategy(true, true)
                 }
             };
-            
+
             jsonSerializerSettings.Converters.Add(stringEnumConverter);
 
             return jsonSerializerSettings;

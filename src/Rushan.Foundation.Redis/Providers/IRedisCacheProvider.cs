@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Rushan.Foundation.Redis
+namespace Rushan.Foundation.Redis.Providers
 {
-    public interface IRedisCacheProvider: ICacheProvider
+    public interface IRedisCacheProvider : ICacheProvider
     {
         /// <summary>
         /// Inserts or update existed cache entry into the cache using the specified key and value with time expiration

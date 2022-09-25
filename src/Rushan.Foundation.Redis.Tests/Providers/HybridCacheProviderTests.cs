@@ -1,13 +1,14 @@
 ﻿using Rushan.Foundation.Redis.Persistences;
-using Rushan.Foundation.Redis.Providers;
+using Rushan.Foundation.Redis.Providers.Impl;
 using Rushan.Foundation.Redis.Serialization;
-using Rushan.Foundation.Redis.Tests.Dummy;
 using AutoFixture;
 using Moq;
 using NUnit.Framework;
 using System;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
+using Rushan.Foundation.Redis.Tests.Dummy;
+using Rushan.Foundation.Redis.Providers;
 
 namespace Rushan.Foundation.Redis.Tests.Providers
 {
@@ -27,7 +28,7 @@ namespace Rushan.Foundation.Redis.Tests.Providers
 
         public HybridCacheProviderTests()
         {
-            _fixture = new Fixture();            
+            _fixture = new Fixture();
         }
 
         [SetUp]
@@ -52,8 +53,8 @@ namespace Rushan.Foundation.Redis.Tests.Providers
             _redisCachePersistence.Setup(c => c.ContainsKey(It.IsAny<string>())).Returns(true);
             _redisCachePersistence.Setup(c => c.GetCachedValue(It.IsAny<string>())).Returns(_serializer.Serialize(value));
             _redisCachePersistence.Setup(c => c.KeyTimeToLive(It.IsAny<string>())).Returns(TimeSpan.FromSeconds(10));
-            
-            _memoryCache.Set(key, value, _dateTimeOffset);           
+
+            _memoryCache.Set(key, value, _dateTimeOffset);
 
             var result = _target.GetOrAddFromCache(() => _dummy.Object.DummyMetod(), key);
 
@@ -61,7 +62,7 @@ namespace Rushan.Foundation.Redis.Tests.Providers
             _redisCachePersistence.Verify(mock => mock.GetCachedValue(It.IsAny<string>()), Times.Never());
             _redisCachePersistence.Verify(mock => mock.KeyTimeToLive(It.IsAny<string>()), Times.Never());
             _dummy.Verify(mock => mock.DummyMetod(), Times.Never());
-            
+
             Assert.AreEqual(result, value);
         }
 
@@ -294,7 +295,7 @@ namespace Rushan.Foundation.Redis.Tests.Providers
             var value = DateTime.UtcNow;
 
             _redisCachePersistence.Setup(c => c.GetCachedValue(It.IsAny<string>())).Throws(new Exception());
-            
+
             Assert.Throws<Exception>(() => _target.GetCachedValue<DateTime>(key));
 
             _redisCachePersistence.Verify(mock => mock.GetCachedValue(It.IsAny<string>()), Times.Once());
@@ -337,7 +338,9 @@ namespace Rushan.Foundation.Redis.Tests.Providers
         }
 
         [Test]
-        public void WhenCall_GetCachedValueAsync_MemoryCacheEmpty_RedisCacheEmpty()
+#pragma warning disable 1998
+        public async Task WhenCall_GetCachedValueAsync_MemoryCacheEmpty_RedisCacheEmpty()
+#pragma warning restore 1998
         {
             var key = Guid.NewGuid().ToString();
             var value = DateTime.UtcNow;
@@ -406,7 +409,7 @@ namespace Rushan.Foundation.Redis.Tests.Providers
             var value = DateTime.UtcNow;
             var serializedValue = _serializer.Serialize(value);
 
-            
+
             _redisCachePersistence.Setup(c => c.ContainsKey(It.IsAny<string>())).Returns(false);
             _redisCachePersistence.Setup(c => c.GetCachedValue(It.IsAny<string>())).Returns((byte[])null);
             _redisCachePersistence.Setup(c => c.KeyTimeToLive(It.IsAny<string>())).Returns((TimeSpan?)null);
@@ -436,7 +439,7 @@ namespace Rushan.Foundation.Redis.Tests.Providers
 
             var actual = _target.ContainsKey(key);
 
-            _redisCachePersistence.Verify(mock => mock.ContainsKey(It.IsAny<string>()), Times.Never());            
+            _redisCachePersistence.Verify(mock => mock.ContainsKey(It.IsAny<string>()), Times.Never());
             Assert.AreEqual(true, actual);
         }
 

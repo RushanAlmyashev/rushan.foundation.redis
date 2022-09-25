@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Rushan.Foundation.Redis.Providers
+namespace Rushan.Foundation.Redis.Providers.Impl
 {
     public abstract class BaseCacheProvider
     {

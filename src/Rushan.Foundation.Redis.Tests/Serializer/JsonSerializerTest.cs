@@ -1,7 +1,7 @@
 ﻿using Rushan.Foundation.Redis.Serialization;
-using Rushan.Foundation.Redis.Tests.Dummy;
 using AutoFixture;
 using NUnit.Framework;
+using Rushan.Foundation.Redis.Tests.Dummy;
 
 namespace Rushan.Foundation.Redis.Tests.Serializer
 {

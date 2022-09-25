@@ -1,13 +1,13 @@
 ﻿using Rushan.Foundation.Redis.Configuration;
-using Rushan.Foundation.Redis.Helpers;
 using Rushan.Foundation.Redis.Logger;
+using Rushan.Foundation.Redis.Helpers;
 using Rushan.Foundation.Redis.Persistences;
 using Rushan.Foundation.Redis.Serialization;
 using System;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
 
-namespace Rushan.Foundation.Redis.Providers
+namespace Rushan.Foundation.Redis.Providers.Impl
 {
     /// <summary>
     /// HybridCacheProvider - ensure two level cache.
@@ -17,13 +17,13 @@ namespace Rushan.Foundation.Redis.Providers
     /// If both cache are empty - get value from source
     /// </summary>
     public class HybridCacheProvider : BaseCacheProvider, ICacheProvider
-    {        
+    {
         private readonly IRedisPersistence _redisPersistence;
         private static readonly MemoryCache _memoryCache = MemoryCache.Default;
 
         private readonly TimeSpan _defaultCacheTime;
         private readonly ILogger _logger;
-        private readonly ISerializer _serializer;                
+        private readonly ISerializer _serializer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HybridCacheProvider"/> class.
@@ -64,13 +64,13 @@ namespace Rushan.Foundation.Redis.Providers
         {
             _redisPersistence = redisPersistence;
             _defaultCacheTime = TimeSpan.FromHours(1);
-            
+
             _logger = logger ?? new EmptyLogger();
             _serializer = serializer ?? new JsonSerializer();
         }
 
         /// <inheritdoc />        
-        public T GetOrAddFromCache<T>(Func<T> execFunc, string cacheKey) 
+        public T GetOrAddFromCache<T>(Func<T> execFunc, string cacheKey)
             => GetOrAddFromCache(execFunc, cacheKey, _defaultCacheTime);
 
         public async Task<T> GetOrAddFromCacheAsync<T>(Func<Task<T>> execFuncAsync, string cacheKey)
@@ -105,14 +105,14 @@ namespace Rushan.Foundation.Redis.Providers
                 result = execFunc();
                 redisCacheTime = cacheTime;
 
-                var byteResult = _serializer.Serialize<T>(result);
+                var byteResult = _serializer.Serialize(result);
                 _redisPersistence.SetCachedValue(cacheKey, byteResult, cacheTime);
             }
 
             var cacheItemPolicy = CacheItemPolicyHelper.ComputeCacheItemPolicy(redisCacheTime);
-            MemoryCacheSet(cacheKey, result, cacheItemPolicy);           
+            MemoryCacheSet(cacheKey, result, cacheItemPolicy);
 
-            return result;            
+            return result;
         }
 
         /// <inheritdoc />
@@ -137,11 +137,11 @@ namespace Rushan.Foundation.Redis.Providers
             }
             else
             {
-                result = await execFuncAsync();                
+                result = await execFuncAsync();
 
-                var byteResult = _serializer.Serialize<T>(result);
+                var byteResult = _serializer.Serialize(result);
                 await _redisPersistence.SetCachedValueAsync(cacheKey, byteResult, cacheTime);
-                
+
                 redisCacheTime = cacheTime;
             }
 
@@ -175,7 +175,7 @@ namespace Rushan.Foundation.Redis.Providers
             {
                 result = execFunc();
 
-                var byteResult = _serializer.Serialize<T>(result);
+                var byteResult = _serializer.Serialize(result);
                 await _redisPersistence.SetCachedValueAsync(cacheKey, byteResult, cacheTime);
 
                 redisCacheTime = cacheTime;
@@ -196,7 +196,7 @@ namespace Rushan.Foundation.Redis.Providers
             if (_memoryCache.Contains(cacheKey))
             {
                 value = MemoryCacheGet<T>(cacheKey);
-                
+
                 return true;
             }
 
@@ -304,7 +304,7 @@ namespace Rushan.Foundation.Redis.Providers
                 _memoryCache.Set(cacheKey, DBNull.Value, policy);
             else
                 _memoryCache.Set(cacheKey, value, policy);
-        }        
+        }
 
         private static T MemoryCacheGet<T>(string cacheKey)
         {
@@ -312,7 +312,7 @@ namespace Rushan.Foundation.Redis.Providers
 
             if (cachedValue.Equals(DBNull.Value))
             {
-                return default(T);
+                return default;
             }
 
             return (T)cachedValue;

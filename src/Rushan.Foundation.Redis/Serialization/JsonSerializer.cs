@@ -4,9 +4,9 @@ using System.IO.Compression;
 
 namespace Rushan.Foundation.Redis.Serialization
 {
-    public class JsonSerializer: ISerializer
+    public class JsonSerializer : ISerializer
     {
-        private static readonly System.Text.Encoding encoding = System.Text.Encoding.UTF8;        
+        private static readonly System.Text.Encoding encoding = System.Text.Encoding.UTF8;
 
 #if NET5_0_OR_GREATER
 
